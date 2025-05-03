@@ -42,8 +42,11 @@
 
 <div id="flipbook"></div>
 
-<script>
-  const pdfPath = 'Brand Guideline Re-Imagine .pdf';  // 🔁 Replace with your file name if different
+ <script>
+  const pdfPath = 'Brand Guideline Re-Imagine .pdf';  // Replace with your filename if different
+
+  // ✅ Fix: Set the PDF.js worker source
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
 
   const loadPDF = async () => {
     const loadingTask = pdfjsLib.getDocument(pdfPath);
@@ -52,14 +55,14 @@
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const scale = 1.5;
-      const viewport = page.getViewport({ scale: scale });
+      const viewport = page.getViewport({ scale });
 
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
       canvas.height = viewport.height;
       canvas.width = viewport.width;
 
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      await page.render({ canvasContext: context, viewport }).promise;
 
       const pageDiv = document.createElement('div');
       pageDiv.className = 'page';
@@ -67,7 +70,6 @@
       document.getElementById('flipbook').appendChild(pageDiv);
     }
 
-    // Initialize Turn.js after all pages are loaded
     $('#flipbook').turn({
       width: 800,
       height: 600,
@@ -75,9 +77,7 @@
     });
   };
 
-  // Load it
   loadPDF();
 </script>
-
 </body>
 </html>
