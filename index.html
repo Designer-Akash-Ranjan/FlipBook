@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Flipbook</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #eee;
+    }
+
+    #flipbook {
+      width: 800px;
+      height: 500px;
+      margin: 40px auto;
+    }
+
+    #flipbook .page {
+      background: white;
+      border: 1px solid #ccc;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="flipbook">
+  <div class="page">Cover Page</div>
+  <div class="page">About</div>
+  <div class="page">Gallery</div>
+  <div class="page">Thank You</div>
+</div>
+
+<script>
+  $('#flipbook').turn({
+    width: 800,
+    height: 500,
+    autoCenter: true
+  });
+</script>
+
+</body>
+</html>
