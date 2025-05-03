@@ -2,49 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Flipbook</title>
+  <title>PDF Flipbook Viewer</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+
   <style>
     body {
+      background: #f5f5f5;
       margin: 0;
-      background: #eee;
+      padding: 40px 0;
+      font-family: sans-serif;
     }
 
     #flipbook {
       width: 800px;
-      height: 500px;
-      margin: 40px auto;
+      height: 600px;
+      margin: auto;
     }
 
-    #flipbook .page {
-      background: white;
-      border: 1px solid #ccc;
+    .page {
       width: 100%;
       height: 100%;
+      background: #fff;
+      overflow: hidden;
       display: flex;
-      align-items: center;
       justify-content: center;
-      font-family: sans-serif;
-      font-size: 24px;
+      align-items: center;
+      border: 1px solid #ddd;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
 <body>
 
-<div id="flipbook">
-  <div class="page">Cover Page</div>
-  <div class="page">About</div>
-  <div class="page">Gallery</div>
-  <div class="page">Thank You</div>
-</div>
+<div id="flipbook"></div>
 
 <script>
-  $('#flipbook').turn({
-    width: 800,
-    height: 500,
-    autoCenter: true
-  });
+  const pdfPath = 'brochure.pdf';  // 🔁 Replace with your file name if different
+
+  const loadPDF = async () => {
+    const loadingTask = pdfjsLib.getDocument(pdfPath);
+    const pdf = await loadingTask.promise;
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale: scale });
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+      const pageDiv = document.createElement('div');
+      pageDiv.className = 'page';
+      pageDiv.appendChild(canvas);
+      document.getElementById('flipbook').appendChild(pageDiv);
+    }
+
+    // Initialize Turn.js after all pages are loaded
+    $('#flipbook').turn({
+      width: 800,
+      height: 600,
+      autoCenter: true
+    });
+  };
+
+  // Load it
+  loadPDF();
 </script>
 
 </body>
