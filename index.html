@@ -4,25 +4,32 @@
   <meta charset="UTF-8">
   <title>Flipbook PDF Viewer</title>
 
-  <!-- Turn.js and PDF.js -->
+  <!-- jQuery + Stable Turn.js v3 + PDF.js -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js@3/turn.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
 
   <style>
     body {
       margin: 0;
-      background: #f4f4f4;
+      padding: 0;
+      background: #f0f0f0;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    .flipbook-container {
+      width: 100vw;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
     }
 
     #flipbook {
       width: 800px;
       height: 600px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
       border: 1px solid #ccc;
     }
 
@@ -37,14 +44,17 @@
     }
 
     .page img {
-      max-width: 100%;
-      max-height: 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
   </style>
 </head>
 <body>
 
-<div id="flipbook"></div>
+<div class="flipbook-container">
+  <div id="flipbook"></div>
+</div>
 
 <script>
   const pdfPath = 'Brand Guideline Re-Imagine .pdf';
@@ -54,13 +64,11 @@
     const loadingTask = pdfjsLib.getDocument(pdfPath);
     const pdf = await loadingTask.promise;
 
-    const flipbook = document.getElementById('flipbook');
     const pages = [];
 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
-      const scale = 2;
-      const viewport = page.getViewport({ scale });
+      const viewport = page.getViewport({ scale: 1.5 });
 
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
@@ -72,7 +80,6 @@
       const img = new Image();
       img.src = canvas.toDataURL();
       img.alt = `Page ${pageNum}`;
-      img.loading = "lazy";
 
       const pageDiv = document.createElement('div');
       pageDiv.className = 'page';
@@ -80,16 +87,16 @@
       pages.push(pageDiv);
     }
 
-    // Append all pages
+    const flipbook = document.getElementById('flipbook');
     pages.forEach(p => flipbook.appendChild(p));
 
-    // Now initialize Turn.js
     $('#flipbook').turn({
       width: 800,
       height: 600,
       autoCenter: true,
-      elevation: 50,
-      gradients: true
+      acceleration: true,
+      gradients: true,
+      elevation: 50
     });
   };
 
