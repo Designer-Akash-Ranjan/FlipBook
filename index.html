@@ -2,23 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PDF Flipbook Viewer</title>
+  <title>Flipbook PDF Viewer</title>
+
+  <!-- Turn.js and PDF.js -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
 
   <style>
     body {
-      background: #f5f5f5;
       margin: 0;
-      padding: 40px 0;
-      font-family: sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     #flipbook {
       width: 800px;
       height: 600px;
-      margin: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #ccc;
     }
 
     .page {
@@ -29,12 +34,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 1px solid #ddd;
     }
 
-    canvas {
+    .page img {
       max-width: 100%;
-      height: auto;
+      max-height: 100%;
     }
   </style>
 </head>
@@ -51,10 +55,11 @@
     const pdf = await loadingTask.promise;
 
     const flipbook = document.getElementById('flipbook');
+    const pages = [];
 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
-      const scale = 1.5;
+      const scale = 2;
       const viewport = page.getViewport({ scale });
 
       const canvas = document.createElement('canvas');
@@ -64,20 +69,21 @@
 
       await page.render({ canvasContext: context, viewport }).promise;
 
-      // ✅ Convert canvas to image
       const img = new Image();
       img.src = canvas.toDataURL();
-      img.style.width = '100%';
-      img.style.height = 'auto';
+      img.alt = `Page ${pageNum}`;
+      img.loading = "lazy";
 
-      // ✅ Create page div and insert image
       const pageDiv = document.createElement('div');
       pageDiv.className = 'page';
       pageDiv.appendChild(img);
-      flipbook.appendChild(pageDiv);
+      pages.push(pageDiv);
     }
 
-    // ✅ Now all pages are loaded — initialize Turn.js
+    // Append all pages
+    pages.forEach(p => flipbook.appendChild(p));
+
+    // Now initialize Turn.js
     $('#flipbook').turn({
       width: 800,
       height: 600,
@@ -89,7 +95,6 @@
 
   loadPDF();
 </script>
-
 
 </body>
 </html>
