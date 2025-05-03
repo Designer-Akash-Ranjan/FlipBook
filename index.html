@@ -43,14 +43,14 @@
 <div id="flipbook"></div>
 
 <script>
-  const pdfPath = 'Brand Guideline Re-Imagine .pdf'; // Adjust if filename changes
+  const pdfPath = 'Brand Guideline Re-Imagine .pdf';
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
 
   const loadPDF = async () => {
     const loadingTask = pdfjsLib.getDocument(pdfPath);
     const pdf = await loadingTask.promise;
 
-    let pagesRendered = 0;
+    const pages = [];
 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
@@ -67,25 +67,27 @@
       const pageDiv = document.createElement('div');
       pageDiv.className = 'page';
       pageDiv.appendChild(canvas);
-      document.getElementById('flipbook').appendChild(pageDiv);
 
-      pagesRendered++;
-
-      // 🧠 Initialize Turn.js only after all pages are rendered
-      if (pagesRendered === pdf.numPages) {
-        $('#flipbook').turn({
-          width: 800,
-          height: 600,
-          autoCenter: true,
-          elevation: 50,
-          gradients: true
-        });
-      }
+      pages.push(pageDiv);
     }
+
+    // After all pages are rendered, append them at once
+    const flipbook = document.getElementById('flipbook');
+    pages.forEach(p => flipbook.appendChild(p));
+
+    // Now initialize Turn.js
+    $('#flipbook').turn({
+      width: 800,
+      height: 600,
+      autoCenter: true,
+      elevation: 50,
+      gradients: true
+    });
   };
 
   loadPDF();
 </script>
+
 
 </body>
 </html>
